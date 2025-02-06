@@ -423,48 +423,48 @@ class AdaLayerNorm(nn.Module):
 
         self.fc = nn.Linear(style_dim, channels*2)
 
-    # def forward(self, x, s):
-    #     x = x.transpose(-1, -2)
-    #     x = x.transpose(1, -1)
-                
-    #     h = self.fc(s)
-    #     h = h.view(h.size(0), h.size(1), 1)
-    #     gamma, beta = torch.chunk(h, chunks=2, dim=1)
-    #     gamma, beta = gamma.transpose(1, -1), beta.transpose(1, -1)
-        
-        
-    #     x = F.layer_norm(x, (self.channels,), eps=self.eps)
-    #     x = (1 + gamma) * x + beta
-    #     return x.transpose(1, -1).transpose(-1, -2)
     def forward(self, x, s):
         x = x.transpose(-1, -2)
         x = x.transpose(1, -1)
-    
-        print(f"Input s: {s if isinstance(s, torch.Tensor) else 's is not a tensor'}")
-        print(f"Shape of s: {s.shape if isinstance(s, torch.Tensor) else 'N/A'}")
-    
-        # Ensure s is a tensor
-        if not isinstance(s, torch.Tensor):
-            raise ValueError("Input s must be a tensor.")
-    
-        h = self.fc(s)  # Ensure `self.fc` is correctly defined
-        print(f"Output of self.fc(s): {h if isinstance(h, torch.Tensor) else 'h is not a tensor'}")
-        print(f"Shape of h: {h.shape if isinstance(h, torch.Tensor) else 'N/A'}")
-    
-        # Ensure h has at least 2 dimensions before reshaping
-        if h.dim() == 1:
-            h = h.view(-1, 1, 1)  # Reshape to (batch_size, 1, 1)
-        elif h.dim() == 2:
-            h = h.unsqueeze(-1)  # Add a third dimension
-        else:
-            h = h.view(h.size(0), h.size(1), 1)
-    
+                
+        h = self.fc(s)
+        h = h.view(h.size(0), h.size(1), 1)
         gamma, beta = torch.chunk(h, chunks=2, dim=1)
         gamma, beta = gamma.transpose(1, -1), beta.transpose(1, -1)
-    
+        
+        
         x = F.layer_norm(x, (self.channels,), eps=self.eps)
         x = (1 + gamma) * x + beta
         return x.transpose(1, -1).transpose(-1, -2)
+    # def forward(self, x, s):
+    #     x = x.transpose(-1, -2)
+    #     x = x.transpose(1, -1)
+    
+    #     print(f"Input s: {s if isinstance(s, torch.Tensor) else 's is not a tensor'}")
+    #     print(f"Shape of s: {s.shape if isinstance(s, torch.Tensor) else 'N/A'}")
+    
+    #     # Ensure s is a tensor
+    #     if not isinstance(s, torch.Tensor):
+    #         raise ValueError("Input s must be a tensor.")
+    
+    #     h = self.fc(s)  # Ensure `self.fc` is correctly defined
+    #     print(f"Output of self.fc(s): {h if isinstance(h, torch.Tensor) else 'h is not a tensor'}")
+    #     print(f"Shape of h: {h.shape if isinstance(h, torch.Tensor) else 'N/A'}")
+    
+    #     # Ensure h has at least 2 dimensions before reshaping
+    #     if h.dim() == 1:
+    #         h = h.view(-1, 1, 1)  # Reshape to (batch_size, 1, 1)
+    #     elif h.dim() == 2:
+    #         h = h.unsqueeze(-1)  # Add a third dimension
+    #     else:
+    #         h = h.view(h.size(0), h.size(1), 1)
+    
+    #     gamma, beta = torch.chunk(h, chunks=2, dim=1)
+    #     gamma, beta = gamma.transpose(1, -1), beta.transpose(1, -1)
+    
+    #     x = F.layer_norm(x, (self.channels,), eps=self.eps)
+    #     x = (1 + gamma) * x + beta
+    #     return x.transpose(1, -1).transpose(-1, -2)
 
 class ProsodyPredictor(nn.Module):
 
